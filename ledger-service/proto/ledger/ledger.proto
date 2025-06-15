@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package ledger;
+option go_package = "github.com/rierarizzo/neobank-go/ledger-service/proto/ledger;ledgerpb";
+
+message CreateAccountRequest {
+  string currency = 1;
+}
+
+message CreateAccountResponse {
+  int64 id = 1;
+  string currency = 2;
+  string status = 3;
+}
+
+service Ledger {
+  rpc CreateAccount(CreateAccountRequest) returns (CreateAccountResponse);
+}

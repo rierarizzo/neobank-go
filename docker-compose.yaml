@@ -1,0 +1,25 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:16
+    container_name: ledger-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ledger
+      POSTGRES_USER: ledger_user
+      POSTGRES_PASSWORD: ledger_pw
+      PGDATA: /var/lib/postgresql/data/pgdata
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB" ]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+volumes:
+  pgdata:
+    name: ledger-pgdata
