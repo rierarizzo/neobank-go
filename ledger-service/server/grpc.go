@@ -30,3 +30,25 @@ func (s *servo) CreateAccount(ctx context.Context, req *pb.CreateAccountRequest)
 		Status:   string(acct.Status),
 	}, nil
 }
+
+func (s *servo) PostTransfer(ctx context.Context, req *pb.PostTransferRequest) (*pb.Empty, error) {
+	currency := domain.Currency(req.GetCurrency())
+
+	err := s.svc.PostTransfer(ctx, req.GetExternalID(), req.GetFromAccountID(), req.GetToAccountID(), req.GetAmount(), currency)
+	if err != nil {
+		return nil, err
+	}
+
+	return nil, nil
+}
+
+func (s *servo) GetBalanceCents(ctx context.Context, req *pb.GetBalanceCentsRequest) (*pb.GetBalanceCentsResponse, error) {
+	balanceCents, err := s.svc.GetBalanceCents(ctx, req.GetAccountID())
+	if err != nil {
+		return nil, err
+	}
+
+	return &pb.GetBalanceCentsResponse{
+		BalanceCents: balanceCents,
+	}, nil
+}

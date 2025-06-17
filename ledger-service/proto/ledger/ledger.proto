@@ -3,6 +3,8 @@ syntax = "proto3";
 package ledger;
 option go_package = "github.com/rierarizzo/neobank-go/ledger-service/proto/ledger;ledgerpb";
 
+message Empty {}
+
 message CreateAccountRequest {
   string currency = 1;
 }
@@ -13,6 +15,24 @@ message CreateAccountResponse {
   string status = 3;
 }
 
+message PostTransferRequest {
+  string externalID = 1;
+  int64 fromAccountID = 2;
+  int64 toAccountID = 3;
+  int64 amount = 4;
+  string currency = 5;
+}
+
+message GetBalanceCentsRequest {
+  int64 accountID = 1;
+}
+
+message GetBalanceCentsResponse {
+  int64 balanceCents = 1;
+}
+
 service Ledger {
   rpc CreateAccount(CreateAccountRequest) returns (CreateAccountResponse);
+  rpc PostTransfer(PostTransferRequest) returns (Empty);
+  rpc GetBalanceCents(GetBalanceCentsRequest) returns (GetBalanceCentsResponse);
 }

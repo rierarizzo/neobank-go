@@ -19,7 +19,9 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	Ledger_CreateAccount_FullMethodName = "/ledger.Ledger/CreateAccount"
+	Ledger_CreateAccount_FullMethodName   = "/ledger.Ledger/CreateAccount"
+	Ledger_PostTransfer_FullMethodName    = "/ledger.Ledger/PostTransfer"
+	Ledger_GetBalanceCents_FullMethodName = "/ledger.Ledger/GetBalanceCents"
 )
 
 // LedgerClient is the client API for Ledger service.
@@ -27,6 +29,8 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type LedgerClient interface {
 	CreateAccount(ctx context.Context, in *CreateAccountRequest, opts ...grpc.CallOption) (*CreateAccountResponse, error)
+	PostTransfer(ctx context.Context, in *PostTransferRequest, opts ...grpc.CallOption) (*Empty, error)
+	GetBalanceCents(ctx context.Context, in *GetBalanceCentsRequest, opts ...grpc.CallOption) (*GetBalanceCentsResponse, error)
 }
 
 type ledgerClient struct {
@@ -47,11 +51,33 @@ func (c *ledgerClient) CreateAccount(ctx context.Context, in *CreateAccountReque
 	return out, nil
 }
 
+func (c *ledgerClient) PostTransfer(ctx context.Context, in *PostTransferRequest, opts ...grpc.CallOption) (*Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Empty)
+	err := c.cc.Invoke(ctx, Ledger_PostTransfer_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *ledgerClient) GetBalanceCents(ctx context.Context, in *GetBalanceCentsRequest, opts ...grpc.CallOption) (*GetBalanceCentsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetBalanceCentsResponse)
+	err := c.cc.Invoke(ctx, Ledger_GetBalanceCents_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // LedgerServer is the server API for Ledger service.
 // All implementations must embed UnimplementedLedgerServer
 // for forward compatibility.
 type LedgerServer interface {
 	CreateAccount(context.Context, *CreateAccountRequest) (*CreateAccountResponse, error)
+	PostTransfer(context.Context, *PostTransferRequest) (*Empty, error)
+	GetBalanceCents(context.Context, *GetBalanceCentsRequest) (*GetBalanceCentsResponse, error)
 	mustEmbedUnimplementedLedgerServer()
 }
 
@@ -64,6 +90,12 @@ type UnimplementedLedgerServer struct{}
 
 func (UnimplementedLedgerServer) CreateAccount(context.Context, *CreateAccountRequest) (*CreateAccountResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateAccount not implemented")
+}
+func (UnimplementedLedgerServer) PostTransfer(context.Context, *PostTransferRequest) (*Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PostTransfer not implemented")
+}
+func (UnimplementedLedgerServer) GetBalanceCents(context.Context, *GetBalanceCentsRequest) (*GetBalanceCentsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetBalanceCents not implemented")
 }
 func (UnimplementedLedgerServer) mustEmbedUnimplementedLedgerServer() {}
 func (UnimplementedLedgerServer) testEmbeddedByValue()                {}
@@ -104,6 +136,42 @@ func _Ledger_CreateAccount_Handler(srv interface{}, ctx context.Context, dec fun
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Ledger_PostTransfer_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(PostTransferRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LedgerServer).PostTransfer(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Ledger_PostTransfer_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LedgerServer).PostTransfer(ctx, req.(*PostTransferRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Ledger_GetBalanceCents_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetBalanceCentsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LedgerServer).GetBalanceCents(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Ledger_GetBalanceCents_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LedgerServer).GetBalanceCents(ctx, req.(*GetBalanceCentsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Ledger_ServiceDesc is the grpc.ServiceDesc for Ledger service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -114,6 +182,14 @@ var Ledger_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CreateAccount",
 			Handler:    _Ledger_CreateAccount_Handler,
+		},
+		{
+			MethodName: "PostTransfer",
+			Handler:    _Ledger_PostTransfer_Handler,
+		},
+		{
+			MethodName: "GetBalanceCents",
+			Handler:    _Ledger_GetBalanceCents_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

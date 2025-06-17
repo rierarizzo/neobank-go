@@ -11,7 +11,7 @@ import (
 
 type LedgerSvc interface {
 	CreateAccount(ctx context.Context, currency domain.Currency) (*domain.LedgerAccount, error)
-	PostTransfer(ctx context.Context, externalID string, fromAccountID, toAccountID int64, currency domain.Currency, amount int) error
+	PostTransfer(ctx context.Context, externalID string, fromAccountID, toAccountID, amount int64, currency domain.Currency) error
 	GetBalanceCents(ctx context.Context, accountID int64) (int64, error)
 }
 
@@ -60,7 +60,7 @@ func (s *ledgerPostgresSvc) CreateAccount(ctx context.Context, currency domain.C
 	return &ledgerAccount, nil
 }
 
-func (s *ledgerPostgresSvc) PostTransfer(ctx context.Context, externalID string, fromAccountID, toAccountID int64, currency domain.Currency, amount int) error {
+func (s *ledgerPostgresSvc) PostTransfer(ctx context.Context, externalID string, fromAccountID, toAccountID, amount int64, currency domain.Currency) error {
 	tx, err := s.db.BeginTx(ctx, &sql.TxOptions{
 		Isolation: sql.LevelSerializable,
 	})
