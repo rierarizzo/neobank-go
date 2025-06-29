@@ -39,7 +39,7 @@ func (s *ledgerPostgresSvc) CreateAccount(ctx context.Context, currency domain.C
 	var newID int64
 	var status string
 	err = tx.QueryRowContext(ctx,
-		"insert into ledger.ledger_accounts (currency) values ($1) returning id, status", currency,
+		"INSERT INTO ledger.ledger_accounts (currency) VALUES ($1) RETURNING id, status", currency,
 	).Scan(&newID, &status)
 	if err != nil {
 		return nil, fmt.Errorf("CreateAccount failed at insert ledger account: %w", err)
@@ -75,7 +75,7 @@ func (s *ledgerPostgresSvc) PostTransfer(ctx context.Context, externalID string,
 
 	count := 0
 	err = tx.QueryRowContext(ctx,
-		"select count(1) from ledger.transfers where external_id = $1", externalID,
+		"SELECT COUNT(1) FROM ledger.transfers WHERE external_id = $1", externalID,
 	).Scan(&count)
 	if err != nil {
 		return err
@@ -87,13 +87,13 @@ func (s *ledgerPostgresSvc) PostTransfer(ctx context.Context, externalID string,
 
 	var fromCurr, toCurr string
 	err = tx.QueryRowContext(ctx,
-		"select currency from ledger.ledger_accounts where id = $1", fromAccountID,
+		"SELECT currency FROM ledger.ledger_accounts WHERE id = $1", fromAccountID,
 	).Scan(&fromCurr)
 	if err != nil {
 		return err
 	}
 	err = tx.QueryRowContext(ctx,
-		"select currency from ledger.ledger_accounts where id = $1", toAccountID,
+		"SELECT currency FROM ledger.ledger_accounts WHERE id = $1", toAccountID,
 	).Scan(&toCurr)
 	if err != nil {
 		return err
@@ -106,7 +106,7 @@ func (s *ledgerPostgresSvc) PostTransfer(ctx context.Context, externalID string,
 
 	var transferID int64
 	err = tx.QueryRowContext(ctx,
-		"insert into ledger.transfers (external_id, from_account_id, to_account_id, currency) values ($1, $2, $3, $4) returning id",
+		"INSERT INTO ledger.transfers (external_id, from_account_id, to_account_id, currency) VALUES ($1, $2, $3, $4) RETURNING id",
 		externalID,
 		fromAccountID,
 		toAccountID,
@@ -116,7 +116,7 @@ func (s *ledgerPostgresSvc) PostTransfer(ctx context.Context, externalID string,
 		return fmt.Errorf("PostTransfer failed at insert transfer (header): %w", err)
 	}
 
-	insertEntryStmnt := "insert into ledger.entries (transfer_id, ledger_account_id, amount) values ($1, $2, $3)"
+	insertEntryStmnt := "INSERT INTO ledger.entries (transfer_id, ledger_account_id, amount) VALUES ($1, $2, $3)"
 	// Inserting credit
 	_, err = tx.ExecContext(ctx, insertEntryStmnt, transferID, toAccountID, +amount)
 	if err != nil {
@@ -132,7 +132,7 @@ func (s *ledgerPostgresSvc) PostTransfer(ctx context.Context, externalID string,
 	// Verifies the balance
 	var balance int64
 	err = tx.QueryRowContext(ctx,
-		"select coalesce(sum(amount),0) from ledger.entries where transfer_id = $1", transferID,
+		"SELECT COALESCE(SUM(amount),0) FROM ledger.entries WHERE transfer_id = $1", transferID,
 	).Scan(&balance)
 	if err != nil {
 		return fmt.Errorf("PostTransfer failed at verify balance query: %w", err)
@@ -148,7 +148,7 @@ func (s *ledgerPostgresSvc) PostTransfer(ctx context.Context, externalID string,
 func (s *ledgerPostgresSvc) GetBalanceCents(ctx context.Context, accountID int64) (int64, error) {
 	var balance int64
 	err := s.db.QueryRowContext(ctx,
-		"select coalesce(sum(amount), 0) from ledger.entries where ledger_account_id = $1", accountID,
+		"SELECT COALESCE(SUM(amount), 0) FROM ledger.entries WHERE ledger_account_id = $1", accountID,
 	).Scan(&balance)
 	if err != nil {
 		return 0, fmt.Errorf("GetBalanceCents failed at verify balance query: %w", err)

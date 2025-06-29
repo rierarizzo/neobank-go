@@ -1,0 +1,12 @@
+databaseChangeLog:
+  - changeSet:
+      id: 202506281045__create_ledger_schemas
+      author: keneth
+      changes:
+        - sqlFile:
+            path: v1/V1__create_ledger_schemas.up.sql
+            relativeToChangelogFile: true
+      rollback:
+        - sqlFile:
+            path: v1/V1__create_ledger_schemas.down.sql
+            relativeToChangelogFile: true

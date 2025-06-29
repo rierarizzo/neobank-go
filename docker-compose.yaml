@@ -3,12 +3,12 @@ version: "3.9"
 services:
   postgres:
     image: postgres:16
-    container_name: ledger-db
+    container_name: neobank-db
     restart: unless-stopped
     environment:
-      POSTGRES_DB: ledger
-      POSTGRES_USER: ledger_user
-      POSTGRES_PASSWORD: ledger_pw
+      POSTGRES_DB: neobank
+      POSTGRES_USER: neobank_user
+      POSTGRES_PASSWORD: neobank_pw
       PGDATA: /var/lib/postgresql/data/pgdata
     ports:
       - "5432:5432"
@@ -22,4 +22,4 @@ services:
 
 volumes:
   pgdata:
-    name: ledger-pgdata
+    name: neobank-pgdata
