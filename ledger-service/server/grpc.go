@@ -4,15 +4,15 @@ import (
 	"context"
 	"github.com/rierarizzo/neobank-go/ledger-service/domain"
 	pb "github.com/rierarizzo/neobank-go/ledger-service/proto/ledger"
-	"github.com/rierarizzo/neobank-go/ledger-service/services"
+	"github.com/rierarizzo/neobank-go/ledger-service/repositories"
 )
 
 type servo struct {
 	pb.UnimplementedLedgerServer
-	svc services.LedgerSvc
+	svc repositories.LedgerRepository
 }
 
-func NewGRPCServer(svc services.LedgerSvc) pb.LedgerServer {
+func NewGRPCServer(svc repositories.LedgerRepository) pb.LedgerServer {
 	return &servo{svc: svc}
 }
 

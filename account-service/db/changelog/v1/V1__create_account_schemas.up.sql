@@ -2,7 +2,7 @@ CREATE SCHEMA IF NOT EXISTS account AUTHORIZATION CURRENT_USER;
 SET search_path TO account;
 
 CREATE TABLE customers (
-    id              uuid PRIMARY KEY,
+    id              UUID PRIMARY KEY,
     identity_number VARCHAR(100) NOT NULL,
     first_name      VARCHAR(100) NOT NULL,
     last_name       VARCHAR(100) NOT NULL,
@@ -22,13 +22,13 @@ CREATE TABLE customers (
 CREATE INDEX idx_customers_identity_number ON customers (identity_number);
 
 CREATE TABLE accounts (
-    account_id        UUID PRIMARY KEY,
-    customer_id       uuid        NOT NULL,
-    ledger_account_id uuid        NOT NULL,
+    id                UUID PRIMARY KEY,
+    customer_id       UUID        NOT NULL,
+    ledger_account_id BIGSERIAL   NOT NULL,
     account_type      VARCHAR(50) NOT NULL DEFAULT 'checking',
     status            VARCHAR(15) NOT NULL DEFAULT 'active',
-    opened_at         timestamptz NOT NULL DEFAULT NOW(),
-    closed_at         timestamptz,
-    created_at        timestamptz NOT NULL DEFAULT NOW(),
-    updated_at        timestamptz NOT NULL DEFAULT NOW(),
+    opened_at         TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    closed_at         TIMESTAMPTZ,
+    created_at        TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at        TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     CONSTRAINT fk_accounts_customer FOREIGN KEY (customer_id) REFERENCES customers (id) ON UPDATE CASCADE ON DELETE RESTRICT)

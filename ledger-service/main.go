@@ -3,8 +3,8 @@ package main
 import (
 	"github.com/rierarizzo/neobank-go/ledger-service/config"
 	pb "github.com/rierarizzo/neobank-go/ledger-service/proto/ledger"
+	"github.com/rierarizzo/neobank-go/ledger-service/repositories"
 	"github.com/rierarizzo/neobank-go/ledger-service/server"
-	"github.com/rierarizzo/neobank-go/ledger-service/services"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
@@ -25,7 +25,7 @@ func main() {
 		return
 	}
 
-	ledgerSvc := services.NewLedgerPostgresService(db)
+	ledgerRepo := repositories.NewLedgerPostgresService(db)
 
 	lis, err := net.Listen("tcp", ":50051")
 	if err != nil {
@@ -34,7 +34,7 @@ func main() {
 	}
 
 	grpcServer := grpc.NewServer()
-	pb.RegisterLedgerServer(grpcServer, server.NewGRPCServer(ledgerSvc))
+	pb.RegisterLedgerServer(grpcServer, server.NewGRPCServer(ledgerRepo))
 	reflection.Register(grpcServer)
 
 	zap.L().Info("gRPC server listening on :50051")
