@@ -1,4 +1,4 @@
-package services
+package repositories
 
 import (
 	"context"
@@ -9,21 +9,21 @@ import (
 	"go.uber.org/zap"
 )
 
-type LedgerSvc interface {
+type LedgerRepository interface {
 	CreateAccount(ctx context.Context, currency domain.Currency) (*domain.LedgerAccount, error)
 	PostTransfer(ctx context.Context, externalID string, fromAccountID, toAccountID, amount int64, currency domain.Currency) error
 	GetBalanceCents(ctx context.Context, accountID int64) (int64, error)
 }
 
-type ledgerPostgresSvc struct {
+type ledgerPostgresRepository struct {
 	db *sql.DB
 }
 
-func NewLedgerPostgresService(db *sql.DB) LedgerSvc {
-	return &ledgerPostgresSvc{db: db}
+func NewLedgerPostgresService(db *sql.DB) LedgerRepository {
+	return &ledgerPostgresRepository{db: db}
 }
 
-func (s *ledgerPostgresSvc) CreateAccount(ctx context.Context, currency domain.Currency) (*domain.LedgerAccount, error) {
+func (s *ledgerPostgresRepository) CreateAccount(ctx context.Context, currency domain.Currency) (*domain.LedgerAccount, error) {
 	tx, err := s.db.BeginTx(ctx, &sql.TxOptions{
 		Isolation: sql.LevelSerializable,
 	})
@@ -60,7 +60,7 @@ func (s *ledgerPostgresSvc) CreateAccount(ctx context.Context, currency domain.C
 	return &ledgerAccount, nil
 }
 
-func (s *ledgerPostgresSvc) PostTransfer(ctx context.Context, externalID string, fromAccountID, toAccountID, amount int64, currency domain.Currency) error {
+func (s *ledgerPostgresRepository) PostTransfer(ctx context.Context, externalID string, fromAccountID, toAccountID, amount int64, currency domain.Currency) error {
 	tx, err := s.db.BeginTx(ctx, &sql.TxOptions{
 		Isolation: sql.LevelSerializable,
 	})
@@ -145,7 +145,7 @@ func (s *ledgerPostgresSvc) PostTransfer(ctx context.Context, externalID string,
 	return tx.Commit()
 }
 
-func (s *ledgerPostgresSvc) GetBalanceCents(ctx context.Context, accountID int64) (int64, error) {
+func (s *ledgerPostgresRepository) GetBalanceCents(ctx context.Context, accountID int64) (int64, error) {
 	var balance int64
 	err := s.db.QueryRowContext(ctx,
 		"SELECT COALESCE(SUM(amount), 0) FROM ledger.entries WHERE ledger_account_id = $1", accountID,
