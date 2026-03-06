@@ -24,7 +24,7 @@ The project follows a microservices architecture with a shared PostgreSQL databa
 
 ## Technologies
 
-- **Language:** Go (1.24+)
+- **Language:** Go (1.25+)
 - **Database:** PostgreSQL (v16)
 - **API:** gRPC / Protobuf
 - **Logging:** Uber Zap (`go.uber.org/zap`)
@@ -39,7 +39,25 @@ The project follows a microservices architecture with a shared PostgreSQL databa
    ```bash
    docker-compose up -d
    ```
-2. **Migrations:** Ensure database schemas are updated (Liquibase). TODO: Add specific command for running migrations.
+2. **Migrations:** Ensure database schemas are updated using Liquibase.
+   - **Ledger Service:**
+     ```bash
+     liquibase \
+       --changelog-file=ledger-service/db/changelog/master.yaml \
+       --url="jdbc:postgresql://localhost:5432/neobank" \
+       --username=neobank_user \
+       --password=neobank_pw \
+       update
+     ```
+   - **Account Service:**
+     ```bash
+     liquibase \
+       --changelog-file=account-service/db/changelog/master.yaml \
+       --url="jdbc:postgresql://localhost:5432/neobank" \
+       --username=neobank_user \
+       --password=neobank_pw \
+       update
+     ```
 3. **Run Services:**
    - **Ledger Service:**
      ```bash
@@ -66,4 +84,4 @@ The project follows a microservices architecture with a shared PostgreSQL databa
 - [ ] Implement Ledger client in `account-service`.
 - [ ] Add unit and integration tests.
 - [ ] Finalize Dockerfiles for production deployment.
-- [ ] Standardize migration runner script.
+- [ ] Standardize migration runner script (e.g., Makefile or shell script).
